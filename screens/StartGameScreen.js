@@ -1,7 +1,28 @@
-import { TextInput, View, StyleSheet } from "react-native";
+import { useState } from "react";
+import { TextInput, View, StyleSheet, Alert } from "react-native";
 import PrimaryButton from "../components/PrimaryButton";
 
 const StartGameScreen = () => {
+  const [enteredNumber, setEnteredNumber] = useState("");
+
+  const numberInputHandler = (enteredText) => {
+    setEnteredNumber(enteredText);
+  };
+  const resetInput = () => {
+    setEnteredNumber("");
+  };
+  const confirmInputHandler = () => {
+    const chosenNumber = parseInt(enteredNumber);
+    if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
+      Alert.alert(
+        "Invalid number!",
+        "Number has to be a number between 1 and 99",
+        [{ text: "Okay", style: "destructive", onPress: resetInput }]
+      );
+      return;
+    }
+		console.log('valid number')
+  };
   return (
     <View style={styles.inputContainer}>
       <TextInput
@@ -10,10 +31,12 @@ const StartGameScreen = () => {
         keyboardType="number-pad"
         autoCapitalize="none"
         autoCorrect={false}
+        value={enteredNumber}
+        onChangeText={numberInputHandler}
       />
       <View style={styles.buttonsContainer}>
-        <PrimaryButton>Reset</PrimaryButton>
-        <PrimaryButton>Confirm</PrimaryButton>
+        <PrimaryButton onPress={resetInput}>Reset</PrimaryButton>
+        <PrimaryButton onPress={confirmInputHandler}>Confirm</PrimaryButton>
       </View>
     </View>
   );
@@ -36,8 +59,8 @@ const styles = StyleSheet.create({
     },
     shadowRadius: 6,
     shadowOpacity: 0.25,
-		justifyContent: "center",
-		alignItems: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
   numberInput: {
     height: 50,
@@ -48,11 +71,11 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     fontWeight: "bold",
     textAlign: "center",
-		width: '40%'
+    width: "40%",
   },
-	buttonsContainer: {
-		flexDirection: 'row',
-		justifyContent: "space-between",
-		marginTop: 16
-	}
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 16,
+  },
 });
