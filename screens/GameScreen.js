@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import Colors from "../constants/colors";
-
+import PrimaryButton from "../components/PrimaryButton";
 
 const GameScreen = ({ userNumber }) => {
-  const initialGuess = generateRandomBetween(1, 100, userNumber);
-  const [currentGuess, setCurrentGuess] = useState(initialGuess);
+  let minBoundary = 1;
+  let maxBoundary = 100;
 
-  function generateRandomBetween(min, max, exclude) {
+  const generateRandomBetween = (min, max, exclude) => {
     const rndNum = Math.floor(Math.random() * (max - min)) + min;
 
     if (rndNum === exclude) {
@@ -15,7 +15,38 @@ const GameScreen = ({ userNumber }) => {
     } else {
       return rndNum;
     }
-  }
+  };
+
+  const initialGuess = generateRandomBetween(
+    minBoundary,
+    maxBoundary,
+    userNumber
+  );
+
+  const [currentGuess, setCurrentGuess] = useState(initialGuess);
+
+  const nextGuessHandler = (direction) => {
+    if (
+      (direction === "lower" && currentGuess < userNumber) ||
+      (direction === "greater" && currentGuess > userNumber)
+    ) {
+      Alert.alert("Do not lie!", "You know that this is wrong", [
+        { text: "Sorry!", style: "cancel" },
+      ]);
+      return;
+    }
+    if (direction === "lower") {
+      maxBoundary = currentGuess;
+    } else {
+      minBoundary = currentGuess + 1;
+    }
+    const newRandomNumber = generateRandomBetween(
+      minBoundary,
+      maxBoundary,
+      userNumber
+    );
+    setCurrentGuess(newRandomNumber);
+  };
 
   return (
     <View style={styles.screen}>
@@ -25,6 +56,14 @@ const GameScreen = ({ userNumber }) => {
       </View>
       <View>
         <Text>Higher or Lower?</Text>
+        <View style={styles.buttonContainer}>
+          <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
+            -
+          </PrimaryButton>
+          <PrimaryButton onPress={nextGuessHandler.bind(this, "greater")}>
+            +
+          </PrimaryButton>
+        </View>
       </View>
       <View>
         <Text>Log Rounds</Text>
@@ -43,24 +82,27 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: 'white',
+    color: "white",
     textAlign: "center",
     borderWidth: 2,
-    borderColor: 'white',
+    borderColor: "white",
     padding: 12,
   },
-	numberContainer: {
-		borderWidth: 4,
-		borderColor: Colors.accent500,
-		padding: 24,
-		borderRadius: 8,
-		margin: 24,
-		alignItems: 'center',
-		justifyContent: 'center'
-	},
-	numberText: {
-		color: Colors.accent500,
-		fontSize: 36,
-		fontWeight: 'bold'
-	}
+  numberContainer: {
+    borderWidth: 4,
+    borderColor: Colors.accent500,
+    padding: 24,
+    borderRadius: 8,
+    margin: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  numberText: {
+    color: Colors.accent500,
+    fontSize: 36,
+    fontWeight: "bold",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+  },
 });
